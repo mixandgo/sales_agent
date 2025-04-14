@@ -1,5 +1,14 @@
-<div>
-  Start your chat with <%= @agent.name %>.
-</div>
+<div class="w-full">
+  <h1 class="text-lg font-bold mb-12">Pick an agent to start a chat with:</h1>
 
-<%= button_to "Start chat", agent_chats_path(@agent), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" %>
+  <% @agents.each do |agent| %>
+    <div class="w-1/3 flex my-4 p-4 border border-gray-200 rounded-lg shadow-sm bg-white">
+      <div class="grow">
+        <div class="font-bold"><%= agent.name %></div>
+        <div><%= agent.description %></div>
+      </div>
+
+      <%= button_to "Start chat", agent_chats_path(agent), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" %>
+    </div>
+  <% end %>
+</div>

@@ -10,13 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_10_104206) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_14_104841) do
   create_table "agents", force: :cascade do |t|
     t.string "name"
     t.text "system_prompt"
     t.text "model"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "description"
   end
 
   create_table "chats", force: :cascade do |t|
