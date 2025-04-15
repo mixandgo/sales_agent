@@ -1,4 +1,4 @@
-<%= turbo_stream_from @chat.stream_id, @chat.messages_id %>
+<%= turbo_stream_from @chat.stream_id %>
 
 <!-- bubble -->
 <button class="fixed bottom-4 right-4 inline-flex items-center justify-center text-sm font-medium disabled:pointer-events-none disabled:opacity-50 border rounded-full w-16 h-16 bg-black hover:bg-gray-700 m-0 cursor-pointer border-gray-200 bg-none p-0 normal-case leading-5 hover:text-gray-900" type="button" aria-haspopup="dialog" aria-expanded="false" data-state="closed">
@@ -17,7 +17,7 @@
     <h2 class="font-semibold text-lg tracking-tight">Chat with <%= @chat.agent.name %></h2>
   </div>
 
-  <div class="pr-4 h-[474px]" style="min-width: 100%; display: table;" id="<%= @chat.messages_id %>">
+  <div class="pr-4 h-[474px] prose" style="min-width: 100%; display: table;" id="<%= @chat.messages_id %>">
     <% @chat.messages do |message| %>
       <%= render partial: "chats/message", locals: { message: message } %>
     <% end %>

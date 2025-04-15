@@ -62,3 +62,4 @@ end
 gem "langchainrb"
 
 gem "ruby-openai", "~> 8.1"
+gem "redcarpet"
