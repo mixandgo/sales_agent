@@ -1,6 +1,5 @@
 <%= turbo_stream_from @chat.stream_id %>
 
-<!-- bubble -->
 <button class="fixed bottom-4 right-4 inline-flex items-center justify-center text-sm font-medium disabled:pointer-events-none disabled:opacity-50 border rounded-full w-16 h-16 bg-black hover:bg-gray-700 m-0 cursor-pointer border-gray-200 bg-none p-0 normal-case leading-5 hover:text-gray-900" type="button" aria-haspopup="dialog" aria-expanded="false" data-state="closed">
   <svg xmlns=" http://www.w3.org/2000/svg" width="30" height="40" viewBox="0 0 24 24" fill="none"
     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -10,15 +9,14 @@
   </svg>
 </button>
 
-
 <div style="box-shadow: 0 0 #0000, 0 0 #0000, 0 1px 2px 0 rgb(0 0 0 / 0.05);" class="fixed bottom-[calc(4rem+1.5rem)] right-0 mr-4 bg-white p-6 rounded-lg border border-[#e5e7eb] w-[440px] h-[664px]"  data-action="turbo:frame-render@window->scroll#scrollToBottom" data-controller="scroll" data-scroll-container-id-value="<%= @chat.messages_id %>">
 
   <div class="flex flex-col space-y-1.5 pb-6 border-b border-[#e5e7eb]">
     <h2 class="font-semibold text-lg tracking-tight">Chat with <%= @chat.agent.name %></h2>
   </div>
 
-  <div class="pr-4 h-[474px] prose overflow-y-auto" id="<%= @chat.messages_id %>">
-    <% @chat.messages do |message| %>
+  <div class="pr-4 h-[474px] overflow-y-auto" id="<%= @chat.messages_id %>">
+    <% @chat.messages.each do |message| %>
       <%= render partial: "chats/message", locals: { message: message } %>
     <% end %>
   </div>
@@ -26,5 +24,5 @@
   <div class="flex items-center pt-4">
     <%= render partial: "chats/form", locals: { chat: @chat } %>
   </div>
-  <p class="text-xs text-center text-[#6b7280] py-4">Powered by <%= link_to "mixandgo.com", "https://mixandgo.com" %></p>
+  <p class="text-xs text-center text-[#6b7280] py-4">Powered by <%= link_to "mixandgo.com", "https://mixandgo.com", class: "underline" %></p>
 </div>

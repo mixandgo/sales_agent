@@ -1,4 +1,6 @@
 class AssistantResponse
+  include ActionView::RecordIdentifier
+
   def initialize(chat:, submission:)
     @chat = chat
     @submission = submission
@@ -7,10 +9,10 @@ class AssistantResponse
 
     # https://github.com/patterns-ai-core/langchainrb?tab=readme-ov-file#assistants
     @assistant = Langchain::Assistant.new(
-      llm: Langchain::LLM::OpenAI.new(api_key: ENV["OPENAI_API_KEY"]),
+      llm: Langchain::LLM::OpenAI.new(api_key: ENV["OPENAI_API_KEY"], default_options: { model: "gpt-41-nano" }),
       instructions: @agent.system_prompt,
       messages: @messages,
-      tools: [],
+      tools: [], # Add tools here if needed
       &response_handler
     )
   end
@@ -20,10 +22,9 @@ class AssistantResponse
   end
 
   def call
-    @assistant.add_message_and_run!(content: "What's the latest news about AI?")
+    @assistant.add_message_and_run!(content: @submission.input)
     @assistant.run # auto_tool_execution: true
   end
-
 
   private
 
@@ -32,18 +33,15 @@ class AssistantResponse
       @last_response = ""
 
       proc do |chunk, _bytesize|
-        Rails.logger.info "------------------------: chunk[#{chunk}]"
+        Rails.logger.info "[CHUNK] ------------------------: chunk[#{chunk}]"
         if (error = chunk.dig("error").presence)
-          Rails.logger.error "------------------------: error[#{error}]"
+          Rails.logger.error "[CHUNK] ------------------------: error[#{error}]"
           raise error
         elsif (finish_reason = chunk.dig("finish_reason").presence)
-          Rails.logger.info "------------------------: finish_reason: #{finish_reason}"
+          Rails.logger.info "[CHUNK] ------------------------: finish_reason: #{finish_reason}"
 
           # Saving the assistant response into a message
           @submission.assistant_message.update(body: @last_response)
-
-          # Updating the chat UI
-          render_message_content(content: @last_response)
         elsif (content = chunk.dig("delta", "content"))
           # Collecting streamed response
           @last_response += content
@@ -51,7 +49,7 @@ class AssistantResponse
           # Updating the chat UI
           render_message_content(content: @last_response)
         else
-          Rails.logger.info "------------------------: event: UNKNOWN STATE"
+          Rails.logger.info "[CHUNK] ------------------------: event: UNKNOWN STATE"
         end
       end
     end
@@ -59,15 +57,8 @@ class AssistantResponse
     def render_message_content(content:)
       Turbo::StreamsChannel.broadcast_update_to(
         @chat.stream_id,
-        target: @chat.messages_id,
-        html: markdown(content)
+        target: dom_id(@submission.assistant_message, :stream),
+        html: content
       )
-    end
-
-    def markdown(text)
-      renderer = Redcarpet::Render::HTML.new
-      markdown = Redcarpet::Markdown.new(renderer, extensions = {})
-
-      markdown.render(text).html_safe
     end
 end
