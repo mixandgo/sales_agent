@@ -1,4 +1,4 @@
-<%= form_with model: chat.submissions.build, url: chat_submissions_path(chat), id: "chat_form", class: "flex items-center justify-center w-full space-x-2" do |f| %>
-  <%= f.text_area :input, class: "flex h-10 w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#9ca3af] disabled:cursor-not-allowed disabled:opacity-50 text-[#030712] focus-visible:ring-offset-2", placeholder: "Type your message" %>
+<%= form_with model: chat.submissions.build, url: chat_submissions_path(chat), id: "chat_form", class: "flex items-center justify-center w-full space-x-2", data: { controller: "form-submit", action: "turbo:submit-end->form-submit#afterSubmit" } do |f| %>
+  <%= f.text_area :input, data: { action: "keydown->form-submit#submitOnEnter", form_submit_target: "input" }, class: "flex h-10 w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#9ca3af] disabled:cursor-not-allowed disabled:opacity-50 text-[#030712] focus-visible:ring-offset-2", placeholder: "Type your message" %>
   <%= f.submit "Send", class: "inline-flex items-center justify-center rounded-md text-sm font-medium text-[#f9fafb] disabled:pointer-events-none disabled:opacity-50 bg-black hover:bg-[#111827E6] h-10 px-4 py-2" %>
 <% end %>
