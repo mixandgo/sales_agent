@@ -12,7 +12,7 @@ class AssistantResponse
       llm: Langchain::LLM::OpenAI.new(api_key: ENV["OPENAI_API_KEY"], default_options: { model: "gpt-41-nano" }),
       instructions:,
       messages: @messages,
-      tools: [], # Add tools here if needed
+      tools: [ ScheduleAppointmentTool.new ],
       &response_handler
     )
   end
