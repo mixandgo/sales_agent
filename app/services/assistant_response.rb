@@ -10,7 +10,7 @@ class AssistantResponse
     # https://github.com/patterns-ai-core/langchainrb?tab=readme-ov-file#assistants
     @assistant = Langchain::Assistant.new(
       llm: Langchain::LLM::OpenAI.new(api_key: ENV["OPENAI_API_KEY"], default_options: { model: "gpt-41-nano" }),
-      instructions: @agent.system_prompt,
+      instructions:,
       messages: @messages,
       tools: [], # Add tools here if needed
       &response_handler
@@ -27,6 +27,11 @@ class AssistantResponse
   end
 
   private
+
+    def instructions
+      prompt = Langchain::Prompt::PromptTemplate.new(template: @agent.system_prompt, input_variables: [ "now", "timezone" ])
+      prompt.format(now: Time.current, timezone: Time.zone.name)
+    end
 
     def response_handler
       Rails.logger.info "------------------------: ResponseHandler START"
