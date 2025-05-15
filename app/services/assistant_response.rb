@@ -1,4 +1,4 @@
-class AssistantResponse
+class AssistantResponse < Base
   include ActionView::RecordIdentifier
 
   def initialize(chat:, submission:)
@@ -17,11 +17,7 @@ class AssistantResponse
     )
   end
 
-  def self.call(...)
-    new(...).call
-  end
-
-  def call
+  def perform
     @assistant.add_message_and_run!(content: @submission.input)
     @assistant.run # auto_tool_execution: true
   end

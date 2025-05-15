@@ -1,3 +1,19 @@
+# == Schema Information
+#
+# Table name: submissions
+#
+#  id         :integer          not null, primary key
+#  input      :text
+#  context    :text
+#  chat_id    :integer          not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+# Indexes
+#
+#  index_submissions_on_chat_id  (chat_id)
+#
+
 class Submission < ApplicationRecord
   belongs_to :chat
   has_many :messages, dependent: :destroy

@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: appointments
+#
+#  id         :integer          not null, primary key
+#  start_at   :datetime         not null
+#  end_at     :datetime         not null
+#  name       :string           not null
+#  email      :string           not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
 class Appointment < ApplicationRecord
   validates :name, presence: true
   validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }
