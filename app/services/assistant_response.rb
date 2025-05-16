@@ -12,14 +12,17 @@ class AssistantResponse < Base
       llm: Langchain::LLM::OpenAI.new(api_key: ENV["OPENAI_API_KEY"], default_options: { model: "gpt-41-nano" }),
       instructions:,
       messages: @messages,
-      tools: [ ScheduleAppointmentTool.new ],
+      tools: [
+        ScheduleAppointmentTool.new,
+        FetchContextTool.new
+      ],
       &response_handler
     )
   end
 
   def perform
     @assistant.add_message_and_run!(content: @submission.input)
-    @assistant.run # auto_tool_execution: true
+    @assistant.run(auto_tool_execution: true)
   end
 
   private
