@@ -62,7 +62,7 @@ class AssistantResponse < Base
       Turbo::StreamsChannel.broadcast_update_to(
         @chat.stream_id,
         target: dom_id(@submission.assistant_message, :stream),
-        html: content
+        html: markdown(content)
       )
     end
 end

@@ -7,8 +7,8 @@
       <span class="text-sm font-semibold text-gray-900 dark:text-white"><%= message.agent? ? 'Assistant' : 'You' %></span>
       <span class="text-sm font-normal text-gray-500 dark:text-gray-400"><%= message.created_at.strftime("%B %d, %Y %I:%M %p") %></span>
     </div>
-    <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white prose-sm" id="<%= dom_id(message, :stream) %>">
+    <div class="prose prose-p:text-sm max-w-none" id="<%= dom_id(message, :stream) %>">
       <%= render partial: "chats/message_body", locals: { message: message } %>
-    </p>
+    </div>
   </div>
 </div>
