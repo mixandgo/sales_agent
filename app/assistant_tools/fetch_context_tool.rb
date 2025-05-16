@@ -8,6 +8,8 @@ class FetchContextTool
   end
 
   def fetch_context(topic:)
+    Rails.logger.info("#{self.class}: Fetching context for '#{topic}'")
+
     @topic_embedding = CreateEmbeddings.call(text: topic).first
 
     chunks = Chunk
@@ -19,7 +21,7 @@ class FetchContextTool
       nil
     else
       context = chunks.map(&:body).join(" ")
-      Rails.logger.info("#{self.class}: Found context for '#{topic}' #{context.truncate(100)}")
+      Rails.logger.info("#{self.class}: Found context for '#{topic}' \n\n-----#{context.truncate(100)}-----\n\n")
 
       context
     end

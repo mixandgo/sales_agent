@@ -1,14 +1,65 @@
-<div class="w-full">
-  <h1 class="text-lg font-bold mb-12">Pick an agent to start a chat with:</h1>
+<div class="w-full flex gap-4 justify-between">
+  <div class="w-1/2">
+    <h2 class="text-lg font-bold mb-12">Pick an agent to start a chat with:</h2>
 
-  <% @agents.each do |agent| %>
-    <div class="w-1/3 flex my-4 p-4 border border-gray-200 rounded-lg shadow-sm bg-white">
-      <div class="grow">
-        <div class="font-bold"><%= agent.name %></div>
-        <div><%= agent.description %></div>
+    <% @agents.each do |agent| %>
+      <div class="w-1/3 flex my-4 p-4 border border-gray-200 rounded-lg shadow-sm bg-white">
+        <div class="grow">
+          <div class="font-bold"><%= agent.name %></div>
+          <div><%= agent.description %></div>
+        </div>
+
+        <%= button_to "Start chat", agent_chats_path(agent), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" %>
       </div>
-
-      <%= button_to "Start chat", agent_chats_path(agent), class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" %>
+    <% end %>
+  </div>
+  <div class="w-1/2">
+    <div class="px-4 sm:px-6 lg:px-8">
+      <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+          <h1 class="text-base font-semibold text-gray-900">Resources</h1>
+          <p class="mt-2 text-sm text-gray-700">A list of all the resources the agent could use for context.</p>
+        </div>
+      </div>
+      <%= form_with model: Resource.new do |f| %>
+      <div class="mt-8 flex gap-4 items-center justify-between">
+        <div class="grow rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
+          <%= f.text_field :name, class: "block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6", placeholder: "e.g. FAQ or About" %>
+        </div>
+        <label for="file-upload" class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 focus-within:outline-hidden hover:text-indigo-500">
+          <span>Select a file</span>
+          <%= f.file_field :file, id: "file-upload", class:"sr-only"%>
+        </label>
+        <%= f.submit "Add resource", class: "block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" %>
+      </div>
+      <% end %>
+      <div class="mt-8 flow-root">
+        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+            <table class="min-w-full divide-y divide-gray-300">
+              <thead>
+                <tr>
+                  <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Name</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Chunks</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Date</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <% @resources.each do |resource| %>
+                <tr>
+                  <td class="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0"><%= resource.name %></td>
+                  <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500"><%= resource.chunks.count %></td>
+                  <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500"><%= resource.created_at.to_fs(:short) %></td>
+                  </td>
+                </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
-  <% end %>
+  </div>
 </div>
+
+

@@ -13,7 +13,10 @@ class Resource < ApplicationRecord
 
   has_one_attached :file
 
-  after_create :create_chunks
+  after_create_commit :create_chunks
+
+  validates :name, presence: true
+  validates :file, presence: true
 
   private
 

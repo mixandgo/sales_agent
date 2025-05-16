@@ -1,6 +1,7 @@
 class ChatsController < ApplicationController
   def index
     @agents = Agent.all
+    @resources = Resource.all
   end
 
   def create
