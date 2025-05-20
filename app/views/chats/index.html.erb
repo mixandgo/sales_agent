@@ -34,13 +34,16 @@
         <div class="grow rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
           <%= f.text_field :name, class: "block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6", placeholder: "e.g. FAQ or About" %>
         </div>
-        <label for="file-upload" class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 focus-within:outline-hidden hover:text-indigo-500">
+        <label for="file-upload" class="relative cursor-pointer rounded-md bg-white/10 font-semibold text-gray-900 focus-within:ring-2 focus-within:ring-gray-900 focus-within:ring-offset-2 focus-within:outline-hidden hover:text-gray-500">
           <span>Select a file</span>
           <%= f.file_field :file, id: "file-upload", class:"sr-only"%>
         </label>
-        <%= f.submit "Add resource", class: "block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" %>
+        <%= f.submit "Add", class: "rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50" %>
+
       </div>
       <% end %>
+
+      <% if @resources.present? %>
       <div class="mt-8 flow-root">
         <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -50,6 +53,7 @@
                   <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Name</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Chunks</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Date</th>
+                  <th scope="col"></th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200">
@@ -58,6 +62,48 @@
                   <td class="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0"><%= resource.name %></td>
                   <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500"><%= resource.chunks.count %></td>
                   <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500"><%= resource.created_at.to_fs(:short) %></td>
+                  <td>
+                    <%= button_to resource_path(resource), method: :delete, class: "rounded-full bg-red-300 p-1 text-white shadow-xs hover:bg-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" do %>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                      </svg>
+                    <% end %>
+                  </td>
+                </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <% end %>
+    </div>
+
+    <% if @appointments.present? %>
+    <div class="mt-20 border border-fuchsia-200 p-4 sm:px-6 lg:px-8">
+      <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+          <h1 class="text-base font-semibold text-gray-900">Appointments</h1>
+          <p class="mt-2 text-sm text-gray-700">A list of all the the appointments.</p>
+        </div>
+      </div>
+      <div class="mt-8 flow-root">
+        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+            <table class="min-w-full divide-y divide-gray-300">
+              <thead>
+                <tr>
+                  <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Date</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Name</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Email</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <% @appointments.each do |appointment| %>
+                <tr>
+                  <td class="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0"><%= appointment.start_at.to_fs(:short) %></td>
+                  <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500"><%= appointment.name %></td>
+                  <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500"><%= appointment.email %></td>
                   </td>
                 </tr>
                 <% end %>
@@ -67,6 +113,7 @@
         </div>
       </div>
     </div>
+    <% end %>
   </div>
 </div>
 <div class="mt-40 pt-8 border-t border-slate-100 text-center">

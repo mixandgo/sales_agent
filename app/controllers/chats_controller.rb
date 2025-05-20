@@ -2,6 +2,7 @@ class ChatsController < ApplicationController
   def index
     @agents = Agent.all
     @resources = Resource.all
+    @appointments = Appointment.all
   end
 
   def create
