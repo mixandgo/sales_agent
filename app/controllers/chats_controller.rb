@@ -13,6 +13,5 @@ class ChatsController < ApplicationController
 
   def show
     @chat = Chat.find(params[:id])
-    # @submissions = @chat.submissions.includes(:messages)
   end
 end
