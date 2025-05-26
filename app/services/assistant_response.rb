@@ -1,5 +1,6 @@
 class AssistantResponse < Base
   include ActionView::RecordIdentifier
+  include ApplicationHelper
 
   def initialize(chat:, submission:)
     @chat = chat
