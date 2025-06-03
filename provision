@@ -1,0 +1,137 @@
+#!/usr/bin/env ruby
+# Provision a virtual private server for Kamal deployments on Ubuntu 24 LTS.
+#
+# This script relies on SSH keys authentication.
+#
+# Make sure to add your private key first:
+# % ssh-add ~/path/to/ssh/key
+require "net/ssh"
+# Kamal requires .env file
+`touch .env`
+require "kamal"
+# Optional Kamal destination as an argument, such as production or staging
+destination = ARGV[1] if ARGV[1].to_s.present?
+# Get server IP and user name from config/deploy.yml
+config_file = Pathname.new(File.expand_path("config/deploy.yml"))
+config = Kamal::Configuration.create_from(config_file: config_file, destination: destination)
+hosts = config.roles.map(&:hosts).flatten + config.accessories.map(&:hosts).flatten
+hosts.uniq!
+user_name = config.ssh.user
+
+# Allow longer lasting ssh connections
+allow_longer_connections = <<~EOF
+  sed -i 's@#ClientAliveInterval 0@ClientAliveInterval 60@g' /etc/ssh/sshd_config;
+  sed -i 's@#ClientAliveCountMax 3@ClientAliveCountMax 10@g' /etc/ssh/sshd_config;
+  systemctl restart ssh
+EOF
+
+# Install essential packages
+update_system = <<~EOF
+  apt update;
+  DEBIAN_FRONTEND=noninteractive apt upgrade -y
+EOF
+
+# Install essential packages
+install_essentials = <<~EOF
+  apt install -y docker.io curl unattended-upgrades
+EOF
+
+# Prepare storage
+prepare_storage = <<~EOF
+  mkdir -p /storage;
+  chmod 700 /storage;
+  chown 1000:1000 /storage
+EOF
+
+# Add swap space
+add_swap = <<~EOF
+  fallocate -l 2GB /swapfile;
+  chmod 600 /swapfile;
+  mkswap /swapfile;
+  swapon /swapfile;
+  echo "\\n/swapfile swap swap defaults 0 0\\n" >> /etc/fstab;
+  sysctl vm.swappiness=20;
+  echo "\\nvm.swappiness=20\\n" >> /etc/sysctl.conf
+EOF
+
+# Install fail2ban
+install_fail2ban = <<~EOF
+  apt install -y fail2ban;
+  systemctl start fail2ban;
+  systemctl enable fail2ban
+EOF
+
+# Configure firewall
+configure_firewall = <<~EOF
+  ufw logging on;
+  ufw default deny incoming;
+  ufw default allow outgoing;
+  ufw allow 22;
+  ufw allow 80;
+  ufw allow 443;
+  ufw --force enable;
+  systemctl restart ufw
+EOF
+
+# Add non-root user
+add_user = <<~EOF
+  useradd --create-home #{user_name};
+  usermod -s /bin/bash #{user_name};
+  su - #{user_name} -c 'mkdir -p ~/.ssh';
+  su - #{user_name} -c 'touch ~/.ssh/authorized_keys';
+  cat /root/.ssh/authorized_keys >> /home/#{user_name}/.ssh/authorized_keys;
+  chmod 700 /home/#{user_name}/.ssh;
+  chmod 600 /home/#{user_name}/.ssh/authorized_keys;
+  echo '#{user_name} ALL=(ALL:ALL) NOPASSWD: ALL' | tee /etc/sudoers.d/#{user_name};
+  chmod 0440 /etc/sudoers.d/#{user_name};
+  visudo -c -f /etc/sudoers.d/#{user_name};
+  usermod -aG docker #{user_name}
+EOF
+
+# Disable root
+# disable_root = <<~EOF
+#   sed -i 's@PasswordAuthentication yes@PasswordAuthentication no@g' /etc/ssh/sshd_config;
+#   sed -i 's@PermitRootLogin yes@PermitRootLogin no@g' /etc/ssh/sshd_config;
+#   systemctl restart ssh
+# EOF
+
+# Configure unattended upgrades
+# Running unattended upgrades will cause server restarts. You might prefer to remove servers from load balancers and manually perform regular updates.
+configure_updates = <<~EOF
+  echo -e "APT::Periodic::Update-Package-Lists \"1\";\nAPT::Periodic::Unattended-Upgrade
+\"1\";\n" > /etc/apt/apt.conf.d/20auto-upgrades;
+  systemctl restart unattended-upgrades
+EOF
+
+
+
+hosts.each do |host|
+  puts "Provisioning server '#{host}' with user '#{user_name}'..."
+  # Run provisioning on server `host`
+  Net::SSH.start(host, "root") do |ssh|
+    puts "Allow longer connections"
+    ssh.exec!(allow_longer_connections)
+    puts "Update system..."
+    ssh.exec!(update_system)
+    puts "Installing essential packages..."
+    ssh.exec!(install_essentials)
+    puts "Adding swap space..."
+    ssh.exec!(add_swap)
+    puts "Preparing storage for disk service..."
+    ssh.exec!(prepare_storage)
+    puts "Adding user with sudo privileges..."
+    ssh.exec!(add_user)
+    puts "Installing and running fail2ban..."
+    ssh.exec!(install_fail2ban)
+    puts "Configure firewall..."
+    ssh.exec!(configure_firewall)
+    # puts "Configure unattended upgrades..."
+    ssh.exec!(configure_updates)
+    # puts "Disabling root..."
+    # ssh.exec!(disable_root)
+  end
+end
+
+puts "Done!"
+puts "Remember to log in as '#{user_name}' from now on:"
+puts " ssh #{user_name}@#{hosts.first}"
