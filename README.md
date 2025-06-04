@@ -1,24 +1,9 @@
-# README
+# Deployment Instructions
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+Copy the `.env.example` file to `.env` to set up your environment variables. This file contains the necessary configurations for your application.
+```
+cp .env.example .env
+./provision
+kamal setup
+kamal deploy
+```
