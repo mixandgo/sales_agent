@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 # Provision a virtual private server for Kamal deployments on Ubuntu 24 LTS.
+# taken from Kamal Handbook 2nd edition (https://kamalmanual.com/handbook/)
 #
 # This script relies on SSH keys authentication.
 #
